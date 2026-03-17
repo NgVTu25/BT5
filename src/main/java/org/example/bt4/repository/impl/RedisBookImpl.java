@@ -10,6 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import io.netty.util.internal.ThreadLocalRandom;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,34 +26,42 @@ public class RedisBookImpl implements BookRepository {
     private final RedisRepository redisRepository;
     private final RedisTemplate<String, Book> redisTemplate;
 
+
     public RedisBookImpl(RedisRepository redisRepository, RedisTemplate<String, Book> redisTemplate) {
         this.redisRepository = redisRepository;
         this.redisTemplate = redisTemplate;
 
     }
 
-    @Override
+  @Override
     public void saveBook(Book book) {
+        if (book.getId() == null) {
+            book.setId(ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE));
+        }
+        
         book.setContent(null);
-       redisRepository.save(book);
+        redisRepository.save(book);
     }
 
     @Override
-    public Page<Book> searchBooks(String title,  String author, String content, int page, int size) {
+    public Page<Book> searchBooks(String title, String author, String content, int page, int size) {
+        List<Book> allBooks = new ArrayList<>();
+        redisRepository.findAll().forEach(allBooks::add);
 
-        List<Book> books = new ArrayList<>();
-        redisRepository.findAll().forEach(books::add);
+        List<Book> filteredBooks = allBooks.stream()
+                .filter(b -> (title == null || title.isBlank() || (b.getTitle() != null && b.getTitle().toLowerCase().contains(title.toLowerCase()))))
+                .filter(b -> (author == null || author.isBlank() || (b.getAuthor() != null && b.getAuthor().toLowerCase().contains(author.toLowerCase()))))
+                .collect(Collectors.toList());
 
         int start = page * size;
-        int end = Math.min(start + size, books.size());
+        int end = Math.min(start + size, filteredBooks.size());
 
-        if(start > books.size()){
-            return Page.empty();
+        if(start >= filteredBooks.size() || start < 0){
+            return Page.empty(PageRequest.of(page, size));
         }
 
-        List<Book> sub = books.subList(start, end);
-
-        return new PageImpl<>(sub, PageRequest.of(page, size), books.size());
+        List<Book> sub = filteredBooks.subList(start, end);
+        return new PageImpl<>(sub, PageRequest.of(page, size), filteredBooks.size());
     }
 
     @Override
@@ -63,44 +73,47 @@ public class RedisBookImpl implements BookRepository {
         }
 
     }
-
+    
 
     @Override
     public void deleteBooks(List<String> ids) {
         if (ids == null || ids.isEmpty()) return;
-        for(String id : ids){
-            redisRepository.deleteById(Long.valueOf(id));
-        }
+        List<Long> longIds = ids.stream()
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
+        redisRepository.deleteAllById(longIds); 
     }
 
     @Override
     public Map<String, Object> statisticByAuthor(String author) {
-        String key = "author:stats:" + author;
+        List<Book> allBooks = new ArrayList<>();
+        redisRepository.findAll().forEach(allBooks::add);
 
-        Map<Object, Object> stats = redisTemplate.opsForHash().entries(key);
+        long count = allBooks.stream()
+                .filter(b -> author.equalsIgnoreCase(b.getAuthor()))
+                .count();
 
-        if (stats.isEmpty()) {
+        if (count == 0) {
             return Map.of("message", "No statistics found for author: " + author);
         }
 
-        return stats.entrySet().stream()
-                .collect(Collectors.toMap(
-                        e -> e.getKey().toString(),
-                        Map.Entry::getValue
-                ));
+        return Map.of(
+                "author", author,
+                "totalBooks", count
+        );
     }
 
     @Override
     public List<Book> findAllPaging(int page, int size) {
-
+    
         List<Book> books = new ArrayList<>();
         redisRepository.findAll().forEach(books::add);
 
         int start = page * size;
         int end = Math.min(start + size, books.size());
 
-        if(start > books.size()){
-            return List.of();
+        if(start >= books.size() || start < 0){
+            return Collections.emptyList();
         }
 
         return books.subList(start, end);

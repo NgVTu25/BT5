@@ -65,7 +65,7 @@ public class BookConsoleApp implements CommandLineRunner {
                 System.out.print("Nhập nội dung: "); book.setContent(scanner.nextLine());
                 System.out.print("Nhập số lượt xem: "); book.setViewCount(Long.parseLong(scanner.nextLine()));
                 System.out.print("Nhập số lượt tải: "); book.setDownloadCount(Long.parseLong(scanner.nextLine()));
-                bookService.saveBookToSpecificDB(book, dbType);
+                bookService.saveBook(book, dbType);
                 System.out.println("Lưu thành công!");
             }
             case 2 -> {

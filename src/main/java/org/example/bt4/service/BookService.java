@@ -18,64 +18,35 @@ public class BookService{
         System.out.println("Các Bean hiện có: " + bookRepositories.keySet());
     }
 
-    public void saveBookToSpecificDB(Book book, String dbType) {
-        BookRepository targetRepo = bookRepositories.get(dbType);
-
-        if (targetRepo != null) {
-            targetRepo.saveBook(book);
-        } else {
+    private BookRepository getRepo(String dbType) {
+        BookRepository repo = bookRepositories.get(dbType);
+        if (repo == null) {
             throw new IllegalArgumentException("Unknown database type: " + dbType);
         }
+        return repo;
     }
 
-    public Page<Book> searchBooks(String dbType , String title, String author, String content, int page, int size) {
-        BookRepository targetRepo = bookRepositories.get(dbType);
+    public void saveBook(Book book, String dbType) {
+        getRepo(dbType).saveBook(book);
+    }
 
-        if (targetRepo != null) {
-            targetRepo.searchBooks(title, author, content, page, size);
-        } else {
-            throw new IllegalArgumentException("Unknown database type: " + dbType);
-        }
-        return targetRepo.searchBooks(title, author, content, page, size);
+    public Page<Book> searchBooks(String dbType, String title, String author, String content, int page, int size) {
+        return getRepo(dbType).searchBooks(title, author, content, page, size);
     }
 
     public void updateBook(String dbType, Long id, Book book) {
-        BookRepository targetRepo = bookRepositories.get(dbType);
-
-        if (targetRepo != null) {
-            targetRepo.updateBook(id, book);
-        } else {
-            throw new IllegalArgumentException("Unknown database type: " + dbType);
-        }
+        getRepo(dbType).updateBook(id, book);
     }
 
     public void deleteBooks(String dbType, List<String> ids) {
-        BookRepository targetRepo = bookRepositories.get(dbType);
-
-        if (targetRepo != null) {
-            targetRepo.deleteBooks(ids);
-        } else {
-            throw new IllegalArgumentException("Unknown database type: " + dbType);
-        }
+        getRepo(dbType).deleteBooks(ids);
     }
 
     public Map<String, Object> statisticByAuthor(String dbType, String author) {
-        BookRepository targetRepo = bookRepositories.get(dbType);
-
-        if (targetRepo != null) {
-            return targetRepo.statisticByAuthor(author);
-        } else {
-            throw new IllegalArgumentException("Unknown database type: " + dbType);
-        }
+        return getRepo(dbType).statisticByAuthor(author);
     }
 
     public List<Book> findAllPaging(String dbType, int page, int size) {
-        BookRepository targetRepo = bookRepositories.get(dbType);
-
-        if (targetRepo != null) {
-            return targetRepo.findAllPaging(page, size);
-        } else {
-            throw new IllegalArgumentException("Unknown database type: " + dbType);
-        }
+        return getRepo(dbType).findAllPaging(page, size);
     }
 }

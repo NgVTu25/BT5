@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RedisHash
+@RedisHash("Book")
 @Document(collection = "book")
 public class Book {
     @Id
