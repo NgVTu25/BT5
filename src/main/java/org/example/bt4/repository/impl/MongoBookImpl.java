@@ -2,7 +2,7 @@ package org.example.bt4.repository.impl;
 
 import org.example.bt4.model.Book;
 import org.example.bt4.repository.BookRepository;
-import org.example.bt4.repository.MongoDBRepository;
+import org.example.bt4.repository.mongo.MongoDBRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,14 +22,17 @@ public class MongoBookImpl implements BookRepository {
 
     @Override
     public void saveBook(Book book) {
+        if (book.getId() == null) {
+            book.setId(java.util.concurrent.ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE));
+        }
         mongoDBRepository.save(book);
-        System.out.println(book.getId());
+        System.out.println("Lưu thành công vào MongoDB với ID: " + book.getId());
     }
 
     @Override
     public Page<Book> searchBooks(String title, String author, String content, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("title").ascending());
-        return mongoDBRepository.findByNameContainingIgnoreCaseAndAuthorContainingIgnoreCaseAndContentContainingIgnoreCase(
+        return mongoDBRepository.findByTitleContainingIgnoreCaseAndAuthorContainingIgnoreCaseAndContentContainingIgnoreCase(
                 (title == null || title.isEmpty()) ? null : title,
                 (author == null || author.isEmpty()) ? null : author,
                 (content == null || content.isEmpty()) ? null : content, pageable);

@@ -1,4 +1,4 @@
-package org.example.bt4.repository;
+package org.example.bt4.repository.sql;
 
 import org.example.bt4.model.Book;
 import org.springframework.data.domain.Page;
@@ -11,7 +11,7 @@ import java.util.Map;
 
 public interface SqlRepository extends JpaRepository<Book, Long> {
 
-    Page<Book> findByNameContainingIgnoreCaseAndAuthorContainingIgnoreCaseAndContentContainingIgnoreCase(String title, Pageable pageable);
+    Page<Book> findByTitleContainingIgnoreCaseAndAuthorContainingIgnoreCaseAndContentContainingIgnoreCase(String title, String author, String content, Pageable pageable);
 
     @Query("""
         SELECT 

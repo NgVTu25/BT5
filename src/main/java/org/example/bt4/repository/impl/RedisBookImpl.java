@@ -2,7 +2,7 @@ package org.example.bt4.repository.impl;
 
 import org.example.bt4.model.Book;
 import org.example.bt4.repository.BookRepository;
-import org.example.bt4.repository.RedisRepository;
+import org.example.bt4.repository.redis.RedisRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

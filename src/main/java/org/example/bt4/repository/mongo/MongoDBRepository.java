@@ -1,4 +1,4 @@
-package org.example.bt4.repository;
+package org.example.bt4.repository.mongo;
 
 
 import org.example.bt4.model.Book;
@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Map;
 
 public interface MongoDBRepository extends MongoRepository<Book, Long> {
-    Page<Book> findByNameContainingIgnoreCaseAndAuthorContainingIgnoreCaseAndContentContainingIgnoreCase(String title,
+    Page<Book> findByTitleContainingIgnoreCaseAndAuthorContainingIgnoreCaseAndContentContainingIgnoreCase(String title,
              String author, String content, Pageable pageable);
 
     @Aggregation(pipeline = {

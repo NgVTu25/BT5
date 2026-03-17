@@ -1,4 +1,4 @@
-package org.example.bt4.repository;
+package org.example.bt4.repository.redis;
 
 import org.example.bt4.model.Book;
 import org.springframework.data.repository.CrudRepository;

@@ -7,15 +7,11 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "org.example.bt4.repository.SqlRepository")
-@EnableMongoRepositories(basePackages = "org.example.bt4.repository.MongoDBRepository")
-@EnableRedisRepositories(basePackages = "org.example.bt4.repository.RedisRepository")
+@EnableJpaRepositories(basePackages = "org.example.bt4.repository.sql")
+@EnableMongoRepositories(basePackages = "org.example.bt4.repository.mongo")
+@EnableRedisRepositories(basePackages = "org.example.bt4.repository.redis")
 public class Bt4Application {
-
     public static void main(String[] args) {
         SpringApplication.run(Bt4Application.class, args);
-        while (true) {
-        }
     }
-
 }

@@ -55,7 +55,7 @@ public class InfluxBookImpl implements BookRepository {
                 .append("|> filter(fn: (r) => r._measurement == \"books\") ");
 
         if (title != null && !title.isEmpty()) {
-            flux.append(String.format("|> filter(fn: (r) => r.name =~ /(?i)%s/) ", title));
+            flux.append(String.format("|> filter(fn: (r) => r.title =~ /(?i)%s/) ", title));
         }
 
         if (author != null && !author.isEmpty()) {

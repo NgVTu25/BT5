@@ -2,7 +2,7 @@ package org.example.bt4.repository.impl;
 
 import org.example.bt4.model.Book;
 import org.example.bt4.repository.BookRepository;
-import org.example.bt4.repository.SqlRepository;
+import org.example.bt4.repository.sql.SqlRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +29,9 @@ public class SqlBookImpl implements BookRepository {
     @Override
     public Page<Book> searchBooks(String title, String author, String content , int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("author").ascending());
-        return sqlRepository.findByNameContainingIgnoreCaseAndAuthorContainingIgnoreCaseAndContentContainingIgnoreCase(
+        return sqlRepository.findByTitleContainingIgnoreCaseAndAuthorContainingIgnoreCaseAndContentContainingIgnoreCase(
+                (title == null || title.isEmpty()) ? null : title,
+                (author == null || author.isEmpty()) ? null : author,
                 (content == null || content.isEmpty()) ? null : content, pageable);
     }
 
