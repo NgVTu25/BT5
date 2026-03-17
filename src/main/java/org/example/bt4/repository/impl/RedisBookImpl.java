@@ -30,7 +30,6 @@ public class RedisBookImpl implements BookRepository {
     public RedisBookImpl(RedisRepository redisRepository, RedisTemplate<String, Book> redisTemplate) {
         this.redisRepository = redisRepository;
         this.redisTemplate = redisTemplate;
-
     }
 
   @Override

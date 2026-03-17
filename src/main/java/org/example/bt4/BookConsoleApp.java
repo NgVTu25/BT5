@@ -5,6 +5,7 @@ import org.example.bt4.service.BookService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -23,7 +24,15 @@ public class BookConsoleApp implements CommandLineRunner {
         boolean running = true;
         while (running) {
             printMainMenu();
-            int choice = Integer.parseInt(scanner.nextLine());
+            String input = scanner.nextLine().trim(); 
+            
+            int choice;
+            try {
+                choice = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("-> [LỖI] Vui lòng chỉ nhập các số từ 0 đến 6!");
+                continue; 
+            }
 
             if (choice == 0) {
                 running = false;
@@ -32,13 +41,17 @@ public class BookConsoleApp implements CommandLineRunner {
                 continue;
             }
 
-            System.out.print("Nhập loại DB (MySql, Mongo, Redis, Influx): ");
-            String dbType = scanner.nextLine();
+            if (choice >= 1 && choice <= 6) {
+                System.out.print("Nhập loại DB (MySql, Mongo, Redis, Influx): ");
+                String dbType = scanner.nextLine();
 
-            try {
-                handleChoice(choice, dbType);
-            } catch (Exception e) {
-                System.err.println("Lỗi: " + e.getMessage());
+                try {
+                    handleChoice(choice, dbType);
+                } catch (Exception e) {
+                    System.err.println("Lỗi xử lý: " + e.getMessage());
+                }
+            } else {
+                System.out.println("-> [LỖI] Lựa chọn không hợp lệ, vui lòng chọn lại!");
             }
         }
     }
@@ -64,6 +77,8 @@ public class BookConsoleApp implements CommandLineRunner {
                 System.out.print("Nhập tên sách: "); book.setTitle(scanner.nextLine());
                 System.out.print("Nhập nội dung: "); book.setContent(scanner.nextLine());
                 System.out.print("Nhập số lượt xem: "); book.setViewCount(Long.parseLong(scanner.nextLine()));
+                book.setCreateDate(LocalDateTime.now());
+                System.out.println("Thời gian khởi tạo: " + book.getCreateDate());
                 System.out.print("Nhập số lượt tải: "); book.setDownloadCount(Long.parseLong(scanner.nextLine()));
                 bookService.saveBook(book, dbType);
                 System.out.println("Lưu thành công!");
