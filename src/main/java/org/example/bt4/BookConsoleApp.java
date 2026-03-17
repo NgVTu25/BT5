@@ -61,7 +61,7 @@ public class BookConsoleApp implements CommandLineRunner {
                 Book book = new Book();
                 System.out.print("Nhập tác giả: "); book.setAuthor(scanner.nextLine());
                 System.out.print("Nhập thể loại: "); book.setCategory(scanner.nextLine());
-             `   System.out.print("Nhập tên sách: "); book.setTitle(scanner.nextLine());
+                System.out.print("Nhập tên sách: "); book.setTitle(scanner.nextLine());
                 System.out.print("Nhập nội dung: "); book.setContent(scanner.nextLine());
                 System.out.print("Nhập số lượt xem: "); book.setViewCount(Long.parseLong(scanner.nextLine()));
                 System.out.print("Nhập số lượt tải: "); book.setDownloadCount(Long.parseLong(scanner.nextLine()));
