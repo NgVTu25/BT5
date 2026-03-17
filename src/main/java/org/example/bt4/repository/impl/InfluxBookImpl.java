@@ -7,7 +7,6 @@ import com.influxdb.client.write.Point;
 import com.influxdb.query.FluxTable;
 import org.example.bt4.model.Book;
 import org.example.bt4.repository.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 
 
 @Repository("Influx")
-public class InfluxdBookImpl implements BookRepository {
+public class InfluxBookImpl implements BookRepository {
     public final InfluxDBClient influxDBClient;
 
     @Value("${influx.url}")
@@ -35,8 +34,7 @@ public class InfluxdBookImpl implements BookRepository {
     @Value("${influx.bucket}")
     private  String bucket;
 
-    @Autowired
-    public InfluxdBookImpl(InfluxDBClient influxDBClient) {
+    public InfluxBookImpl(InfluxDBClient influxDBClient) {
         this.influxDBClient = influxDBClient;
     }
 
@@ -48,7 +46,7 @@ public class InfluxdBookImpl implements BookRepository {
 
 
     @Override
-    public Page<Book> searchBooks(String name, String author, String content, int page, int size) {
+    public Page<Book> searchBooks(String title, String author, String content, int page, int size) {
         int offset = page * size;
 
         StringBuilder flux = new StringBuilder();
@@ -56,8 +54,8 @@ public class InfluxdBookImpl implements BookRepository {
                 .append("|> range(start: -1y) ")
                 .append("|> filter(fn: (r) => r._measurement == \"books\") ");
 
-        if (name != null && !name.isEmpty()) {
-            flux.append(String.format("|> filter(fn: (r) => r.name =~ /(?i)%s/) ", name));
+        if (title != null && !title.isEmpty()) {
+            flux.append(String.format("|> filter(fn: (r) => r.name =~ /(?i)%s/) ", title));
         }
 
         if (author != null && !author.isEmpty()) {
@@ -91,7 +89,6 @@ public class InfluxdBookImpl implements BookRepository {
 
             Point point = Point.measurement("books")
                     .addTag("id", id.toString())
-                    .addField("name", book.getName())
                     .addField("author", book.getAuthor())
                     .addField("category", book.getCategory())
                     .addField("title", book.getTitle())
