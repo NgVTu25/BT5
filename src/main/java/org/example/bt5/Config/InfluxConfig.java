@@ -1,4 +1,4 @@
-package org.example.bt4.Config;
+package org.example.bt5.Config;
 
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class InfluxdConfig {
+public class InfluxConfig {
     @Value("${influx.url}")
     private String url;
     @Value("${influx.token}")

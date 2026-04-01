@@ -1,8 +1,8 @@
-package org.example.bt4.Config;
+package org.example.bt5.Config;
 
 
 
-import org.example.bt4.model.Book;
+import org.example.bt5.model.BookCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -20,15 +20,15 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Book> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Book> template = new RedisTemplate<>();
+    public RedisTemplate<String, BookCache> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, BookCache> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
 
-        Jackson2JsonRedisSerializer<Book> serializer =
-                new Jackson2JsonRedisSerializer<>(Book.class);
+        Jackson2JsonRedisSerializer<BookCache> serializer =
+                new Jackson2JsonRedisSerializer<>(BookCache.class);
 
         template.setValueSerializer(serializer);
         template.setHashValueSerializer(serializer);
