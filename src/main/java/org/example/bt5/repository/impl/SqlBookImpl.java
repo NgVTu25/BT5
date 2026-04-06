@@ -3,6 +3,7 @@ package org.example.bt5.repository.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.bt5.model.BookSQL;
 import org.example.bt5.repository.BookRepository;
+import org.example.bt5.repository.PagingAndSortingRepository;
 import org.example.bt5.repository.sql.SqlRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Repository("MySql")
+@Repository("mysql")
 @RequiredArgsConstructor
 public class SqlBookImpl implements BookRepository<BookSQL, Long> {
     private final SqlRepository sqlRepository;
@@ -65,7 +66,7 @@ public class SqlBookImpl implements BookRepository<BookSQL, Long> {
 
     @Override
     public void deleteBooks(List<Long> ids) {
-        for(Long id : ids) {
+        for (Long id : ids) {
             sqlRepository.deleteById(id);
         }
     }
@@ -82,7 +83,7 @@ public class SqlBookImpl implements BookRepository<BookSQL, Long> {
     }
 
     @Override
-    public Page<BookSQL> findAllPaging(Pageable pageable) {
+    public Page<BookSQL> findAll(Pageable pageable) {
         Pageable actualPageable = (pageable != null) ? pageable : PageRequest.of(0, 10);
 
         return sqlRepository.findAll(actualPageable);

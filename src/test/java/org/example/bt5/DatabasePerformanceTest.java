@@ -29,8 +29,8 @@ public class DatabasePerformanceTest {
 
     // ================= MAIN LOGIC =================
     public void generateAndInsert(String dbType) {
-        int totalRecords = 1_000_000;
-        int batchSize = 10_000;
+        int totalRecords = 500_000;
+        int batchSize = 5_000;
 
         String[] categories = {"Hành động", "Tình cảm", "Khoa học", "Lịch sử", "Kinh dị"};
         String[] authors = {"Nguyen Van A", "Tran Thi B", "Le Van C", "Tolkien", "J.K. Rowling"};
@@ -115,13 +115,15 @@ public class DatabasePerformanceTest {
         String type = dbType.toLowerCase();
 
         try {
-            if (type.contains("mysql") || type.contains("sql")) {
-                return objectMapper.convertValue(bookBody, BookSQL.class);
-            } else if (type.contains("mongo")) {
-                return objectMapper.convertValue(bookBody, BookDocument.class);
-            } else if (type.contains("redis")) {
-                return objectMapper.convertValue(bookBody, BookCache.class);
-            } else if (type.contains("influx")) {
+//            if (type.contains("mysql") || type.contains("sql")) {
+//                return objectMapper.convertValue(bookBody, BookSQL.class);
+//            } else if (type.contains("mongo")) {
+//                return objectMapper.convertValue(bookBody, BookDocument.class);
+//            } else if (type.contains("redis")) {
+//                return objectMapper.convertValue(bookBody, BookCache.class);
+//            } else
+//
+                if (type.contains("influx")) {
                 return objectMapper.convertValue(bookBody, BookMetric.class);
             } else {
                 throw new IllegalArgumentException("Database type không được hỗ trợ: " + dbType);

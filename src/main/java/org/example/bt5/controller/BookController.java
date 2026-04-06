@@ -43,7 +43,7 @@ public class BookController {
     @PutMapping("/{db}/{id}")
     public ResponseEntity<String> updateBook(
             @PathVariable String db,
-            @PathVariable String id, // Đã khớp String cho UUID
+            @PathVariable String id,
             @RequestBody Object book
     ) {
         bookService.updateBook(db, id, book);
@@ -53,7 +53,7 @@ public class BookController {
     @DeleteMapping("/{db}")
     public ResponseEntity<String> deleteBooks(
             @PathVariable String db,
-            @RequestBody List<String> ids // Đồng bộ List<String> cho UUID
+            @RequestBody List<String> ids
     ) {
         bookService.deleteBooks(db, ids);
         return ResponseEntity.ok("Delete success");

@@ -21,7 +21,7 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository("Influx")
+@Repository("influx")
 @RequiredArgsConstructor
 public class InfluxBookImpl implements BookRepository<BookMetric, String> {
     public final InfluxDBClient influxDBClient;
@@ -49,7 +49,8 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
                 if (idObj != null) {
                     try {
                         book.setId(idObj.toString());
-                    } catch (NumberFormatException ignore) { }
+                    } catch (NumberFormatException ignore) {
+                    }
                 }
 
                 Object title = record.getValueByKey("title");
@@ -65,14 +66,16 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
                 if (viewCount != null) {
                     try {
                         book.setViewCount(Long.parseLong(viewCount.toString()));
-                    } catch (NumberFormatException ignore) { }
+                    } catch (NumberFormatException ignore) {
+                    }
                 }
 
                 Object downloadCount = record.getValueByKey("downloadCount");
                 if (downloadCount != null) {
                     try {
                         book.setDownloadCount(Long.parseLong(downloadCount.toString()));
-                    } catch (NumberFormatException ignore) { }
+                    } catch (NumberFormatException ignore) {
+                    }
                 }
 
                 books.add(book);
@@ -250,7 +253,7 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
     }
 
     @Override
-    public Page<BookMetric> findAllPaging(Pageable pageable) {
+    public Page<BookMetric> findAll(Pageable pageable) {
 
         String flux = String.format(
                 "from(bucket: \"%s\") " +
@@ -261,7 +264,7 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
                         "r._field == \"category\" or " +
                         "r._field == \"title\") " +
                         "|> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\") " +
-                        "|> keep(columns: [\"_time\", \"author\", \"category\", \"title\"]) " +
+                        "|> keep(columns: [\"_time\", \"id\", \"author\", \"category\", \"title\"]) " +
                         "|> group() " +
                         "|> sort(columns: [\"_time\"], desc: true) " +
                         "|> limit(n: %d, offset: %d)",

@@ -1,7 +1,6 @@
 package org.example.bt5.Config;
 
-
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.bt5.model.BookCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +19,10 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, BookCache> redisTemplate(RedisConnectionFactory connectionFactory) {
+    public RedisTemplate<String, BookCache> redisTemplate(
+            RedisConnectionFactory connectionFactory,
+            ObjectMapper objectMapper) {
+
         RedisTemplate<String, BookCache> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
@@ -28,7 +30,7 @@ public class RedisConfig {
         template.setHashKeySerializer(new StringRedisSerializer());
 
         Jackson2JsonRedisSerializer<BookCache> serializer =
-                new Jackson2JsonRedisSerializer<>(BookCache.class);
+                new Jackson2JsonRedisSerializer<>(objectMapper, BookCache.class);
 
         template.setValueSerializer(serializer);
         template.setHashValueSerializer(serializer);
