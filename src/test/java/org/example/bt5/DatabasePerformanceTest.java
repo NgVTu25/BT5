@@ -1,15 +1,13 @@
 package org.example.bt5;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.bt5.model.BookCache;
 import org.example.bt5.model.BookDocument;
 import org.example.bt5.model.BookMetric;
 import org.example.bt5.model.BookSQL;
 import org.example.bt5.repository.BookRepository;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -29,11 +27,11 @@ public class DatabasePerformanceTest {
 
     // ================= MAIN LOGIC =================
     public void generateAndInsert(String dbType) {
-        int totalRecords = 1_000_000;
-        int batchSize = 5_000;
+        int totalRecords = 350_000;
+        int batchSize = 100;
 
-        String[] categories = {"Hành động", "Tình cảm", "Khoa học", "Lịch sử", "Kinh dị"};
-        String[] authors = {"Nguyen Van A", "Tran Thi B", "Le Van C", "Tolkien", "J.K. Rowling"};
+        String[] categories = {"Hành động", "Tình cảm", "Khoa học", "Lịch sử", "Kinh dị", "Trinh thám", "Kỹ năng", "Kinh tế"};
+        String[] authors = {"Nguyen Van A", "Tran Thi B", "Le Van C", "Tolkien", "J.K. Rowling", "George Orwell", "Haruki Murakami"};
 
         System.out.println("Bắt đầu sinh 1.000.000 dữ liệu cho " + dbType);
         long start = System.currentTimeMillis();
@@ -123,7 +121,7 @@ public class DatabasePerformanceTest {
 //                return objectMapper.convertValue(bookBody, BookCache.class);
 //            } else
 
-                if (type.contains("influx")) {
+            if (type.contains("influx")) {
                 return objectMapper.convertValue(bookBody, BookMetric.class);
             } else {
                 throw new IllegalArgumentException("Database type không được hỗ trợ: " + dbType);

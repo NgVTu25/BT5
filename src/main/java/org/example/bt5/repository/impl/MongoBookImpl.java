@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.bt5.model.BookDocument;
 import org.example.bt5.repository.BookRepository;
 import org.example.bt5.repository.mongo.MongoDBRepository;
-import org.example.bt5.repository.PagingAndSortingRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

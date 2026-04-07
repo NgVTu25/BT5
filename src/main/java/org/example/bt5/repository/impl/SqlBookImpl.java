@@ -3,7 +3,6 @@ package org.example.bt5.repository.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.bt5.model.BookSQL;
 import org.example.bt5.repository.BookRepository;
-import org.example.bt5.repository.PagingAndSortingRepository;
 import org.example.bt5.repository.sql.SqlRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

@@ -7,7 +7,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -165,6 +168,7 @@ public class RedisBookImpl implements BookRepository<BookCache, String> {
             if (book != null) {
                 stringRedisTemplate.opsForList().remove(BOOKS_ALL_KEY, 0, id);
                 redisTemplate.delete(key);
+                System.out.println("Đã xóa sách với ID: " + id);
                 removeIndexes(book);
             }
         }

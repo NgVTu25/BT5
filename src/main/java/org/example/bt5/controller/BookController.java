@@ -46,7 +46,7 @@ public class BookController {
             @PathVariable String id,
             @RequestBody Object book
     ) {
-        bookService.updateBook(db, id, book);
+        bookService.updateBook(db.trim().toLowerCase(), id, book);
         return ResponseEntity.ok("Update success");
     }
 

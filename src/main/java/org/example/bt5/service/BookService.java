@@ -14,6 +14,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +32,6 @@ public class BookService<T> {
     }
 
     public void saveBook(Object book, String dbType) {
-        Object Bookdb;
-
         String type = (dbType == null) ? "" : dbType.trim().toLowerCase();
 
         try {
@@ -65,12 +64,37 @@ public class BookService<T> {
         return getRepo(dbType.toLowerCase()).statisticByAuthor(author);
     }
 
-    public void updateBook(String dbType, String id, T book) {
-        getRepo(dbType.toLowerCase()).updateBook(id, book);
+    public void updateBook(String dbType, String id, Object book) {
+        try {
+            Object bookDb;
+
+            if (dbType.contains("mysql") || dbType.contains("sql")) {
+                bookDb = objectMapper.convertValue(book, BookSQL.class);
+                getRepo(dbType.toLowerCase()).updateBook(Long.parseLong(id), bookDb);
+            } else if (dbType.contains("mongodb")) {
+                bookDb = objectMapper.convertValue(book, BookDocument.class);
+                getRepo(dbType.toLowerCase()).updateBook(id, bookDb);
+            } else if (dbType.contains("redis") || dbType.contains("cache")) {
+                bookDb = objectMapper.convertValue(book, BookCache.class);
+                getRepo(dbType.toLowerCase()).updateBook(id, bookDb);
+            } else if (dbType.contains("influx")) {
+                bookDb = objectMapper.convertValue(book, BookMetric.class);
+                getRepo(dbType.toLowerCase()).updateBook(id, bookDb);
+            } else {
+                throw new IllegalArgumentException("Database type không được hỗ trợ: " + dbType);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi chuyển đổi dữ liệu sách: " + e.getMessage());
+        }
     }
 
     public void deleteBooks(String dbType, List<String> ids) {
-        getRepo(dbType.toLowerCase()).deleteBooks(ids);
+        if (dbType.contains("mysql") || dbType.contains("sql")) {
+            List<Long> BookIds = ids.stream().map(Long::parseLong).collect(Collectors.toList());
+            getRepo(dbType.toLowerCase()).deleteBooks(BookIds);
+        } else {
+            getRepo(dbType.toLowerCase()).deleteBooks(ids);
+        }
     }
 
     public Page<?> findAllPaging(String db, Pageable pageable) {

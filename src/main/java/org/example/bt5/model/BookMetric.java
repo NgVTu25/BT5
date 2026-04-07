@@ -20,6 +20,7 @@ import java.time.Instant;
 @Measurement(name = "Book")
 public class BookMetric {
     @Id
+    @Column(tag = true)
     private String id;
     @Column(tag = true)
     private String author;

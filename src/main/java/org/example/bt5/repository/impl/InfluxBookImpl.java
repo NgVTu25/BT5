@@ -1,5 +1,6 @@
 package org.example.bt5.repository.impl;
 
+import com.influxdb.client.DeleteApi;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
@@ -19,7 +20,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository("influx")
 @RequiredArgsConstructor
@@ -141,7 +141,7 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
     }
 
     public Point writeData(BookMetric book) {
-        Point point = Point.measurement(MEASUREMENT)
+        return Point.measurement(MEASUREMENT)
                 .addTag("id", String.valueOf(book.getId()))
                 .addTag("author", book.getAuthor() == null ? "Unknown" : book.getAuthor())
                 .addTag("category", book.getCategory() == null ? "General" : book.getCategory())
@@ -152,7 +152,6 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
                 .addField("downloadCount", book.getDownloadCount() == null ? 0L : book.getDownloadCount())
 
                 .time(book.getCreateDate() != null ? book.getCreateDate() : Instant.now(), WritePrecision.NS);
-        return point;
     }
 
 
@@ -184,22 +183,15 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
 
     @Override
     public void deleteBooks(List<String> ids) {
+        DeleteApi deleteApi = influxDBClient.getDeleteApi();
         if (ids == null || ids.isEmpty()) return;
 
         OffsetDateTime start = OffsetDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
         OffsetDateTime stop = OffsetDateTime.now();
 
-        String predicate = ids.stream()
-                .map(id -> "id = \"" + id + "\"")
-                .collect(Collectors.joining(" OR "));
-
-        String finalPredicate = "(_measurement = \"" + MEASUREMENT + "\") AND (" + predicate + ")";
-
-        try {
-            influxDBClient.getDeleteApi().delete(start, stop, finalPredicate, bucket, org);
-            System.out.println("Đã xóa các sách có ID: " + ids);
-        } catch (Exception e) {
-            System.err.println("Lỗi khi xóa dữ liệu InfluxDB: " + e.getMessage());
+        for (String id : ids) {
+            String predicate = "_measurement=\"" + MEASUREMENT + "\" AND id=\"" + id + "\"";
+            deleteApi.delete(start, stop, predicate, bucket, org);
         }
     }
 
@@ -207,13 +199,12 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
     public Map<String, Object> statisticByAuthor(String author) {
         String flux = String.format(
                 "from(bucket: \"%s\") " +
-                        "|> range(start: 0) " +
+                        "|> range(start: -30d) " +
                         "|> filter(fn: (r) => r._measurement == \"Book\") " +
                         "|> filter(fn: (r) => r.author == \"%s\") " +
-                        "|> filter(fn: (r) => r._field == \"id\" or r._field == \"category\") " +
-                        "|> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\") " +
-                        "|> group(columns: [\"author\", \"category\"]) " +
-                        "|> count(column: \"id\")",
+                        "|> group(columns: [\"category\"]) " +
+                        "|> count() " +
+                        "|> group()",
                 bucket, author
         );
 
