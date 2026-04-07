@@ -30,8 +30,31 @@ public class BookService<T> {
         return repo;
     }
 
-    public void saveBook(T book, String dbType) {
-        getRepo(dbType).saveBook(book);
+    public void saveBook(Object book, String dbType) {
+        Object Bookdb;
+
+        String type = (dbType == null) ? "" : dbType.trim().toLowerCase();
+
+        try {
+            Object bookDb;
+
+            if (type.contains("mysql") || type.contains("sql")) {
+                bookDb = objectMapper.convertValue(book, BookSQL.class);
+            } else if (type.contains("mongo")) {
+                bookDb = objectMapper.convertValue(book, BookDocument.class);
+            } else if (type.contains("redis") || type.contains("cache")) {
+                bookDb = objectMapper.convertValue(book, BookCache.class);
+            } else if (type.contains("influx")) {
+                bookDb = objectMapper.convertValue(book, BookMetric.class);
+            } else {
+                throw new IllegalArgumentException("Database type không được hỗ trợ: " + dbType);
+            }
+
+            getRepo(type).saveBook(bookDb);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi chuyển đổi dữ liệu sách: " + e.getMessage());
+        }
     }
 
     public Page<?> searchBooks(String dbType, String title, String author, String content, Pageable pageable) {
@@ -55,7 +78,7 @@ public class BookService<T> {
         int page = Math.max(pageable.getPageNumber(), 0);
 
         Pageable safePageable = PageRequest.of(page, size, pageable.getSort());
-
+        System.out.println(db.toLowerCase());
         return getRepo(db.toLowerCase()).findAll(safePageable);
     }
 }
