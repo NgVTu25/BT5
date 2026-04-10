@@ -7,7 +7,6 @@ import org.example.bt5.repository.sql.SqlRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -27,25 +26,70 @@ public class SqlBookImpl implements BookRepository<BookSQL, Long> {
         System.out.println(book.getId());
     }
 
+//    @Override
+//    public Page<BookSQL> searchBooks(String title, String author, String content, Pageable pageable) {
+//
+//        Specification<BookSQL> spec = (root, query, cb) -> cb.conjunction();
+//
+//        if (title != null && !title.isBlank()) {
+//            spec = spec.and((root, query, cb) ->
+//                    cb.like((root.get("title")), "%" + title.toLowerCase() + "%"));
+//        }
+//
+//        if (author != null && !author.isBlank()) {
+//            spec = spec.and((root, query, cb) ->
+//                    cb.like((root.get("author")), "%" + author.toLowerCase() + "%"));
+//        }
+//
+//        if (content != null && !content.isBlank()) {
+//            spec = spec.and((root, query, cb) ->
+//                    cb.like((root.get("content")), "%" + content.toLowerCase() + "%"));
+//        }
+//
+//        pageable = PageRequest.of(
+//                pageable == null ? 0 : pageable.getPageNumber(),
+//                pageable == null ? 10 : pageable.getPageSize(),
+//                Sort.by("author").ascending()
+//        );
+//
+//        return sqlRepository.findAll(spec, pageable);
+//    }
+
+//    private String normalize(String input) {
+//        return (input == null || input.isBlank()) ? null : input.trim();
+//    }
+
     @Override
-    public Page<BookSQL> searchBooks(String title, String author, String content,
-                                     Pageable pageable) {
+    public Page<BookSQL> searchBooks(String title, String author, String content, Pageable pageable) {
 
-        int page = pageable == null ? 0 : pageable.getPageNumber();
-        int size = pageable == null ? 10 : pageable.getPageSize();
+        String keyword = buildKeyword(title, author, content);
 
-        pageable = PageRequest.of(page, size, Sort.by("author").ascending());
-
-        return sqlRepository.searchBooksCustom(
-                normalize(title),
-                normalize(author),
-                normalize(content),
-                pageable
+        pageable = PageRequest.of(
+                pageable == null ? 0 : pageable.getPageNumber(),
+                pageable == null ? 10 : pageable.getPageSize()
         );
+
+        if (keyword.isBlank()) {
+            return sqlRepository.findAll(pageable);
+        }
+
+        return sqlRepository.searchFullText(keyword, pageable);
     }
 
-    private String normalize(String input) {
-        return (input == null || input.isBlank()) ? null : input.trim();
+    private String buildKeyword(String title, String author, String content) {
+        StringBuilder sb = new StringBuilder();
+
+        if (title != null && !title.isBlank()) {
+            sb.append(title).append(" ");
+        }
+        if (author != null && !author.isBlank()) {
+            sb.append(author).append(" ");
+        }
+        if (content != null && !content.isBlank()) {
+            sb.append(content);
+        }
+
+        return sb.toString().trim();
     }
 
     @Override

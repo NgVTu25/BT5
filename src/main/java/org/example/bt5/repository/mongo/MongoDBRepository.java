@@ -19,9 +19,7 @@ public interface MongoDBRepository extends MongoRepository<BookDocument, String>
             "{ '$group': { " +
                     "    '_id': '$author', " +
                     "    'totalBooks': { '$sum': 1 }, " +
-                    "    'totalViews': { '$sum': '$viewCount' }, " +
-                    "    'avgViews': { '$avg': '$viewCount' }, " +
-                    "    'maxViews': { '$max': '$viewCount' } " +
+                    "    'categories': { '$addToSet': '$category' } " +
                     "} }"
     })
     List<Map<String, Object>> statisticByAuthor(String author);
