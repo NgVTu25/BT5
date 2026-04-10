@@ -46,10 +46,7 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
 
                 Object idObj = record.getValueByKey("id");
                 if (idObj != null) {
-                    try {
-                        book.setId(idObj.toString());
-                    } catch (NumberFormatException ignore) {
-                    }
+                    book.setId(idObj.toString());
                 }
 
                 Object title = record.getValueByKey("title");
@@ -63,18 +60,12 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
 
                 Object viewCount = record.getValueByKey("viewCount");
                 if (viewCount != null) {
-                    try {
-                        book.setViewCount(Long.parseLong(viewCount.toString()));
-                    } catch (NumberFormatException ignore) {
-                    }
+                    book.setViewCount(Long.parseLong(viewCount.toString()));
                 }
 
                 Object downloadCount = record.getValueByKey("downloadCount");
                 if (downloadCount != null) {
-                    try {
-                        book.setDownloadCount(Long.parseLong(downloadCount.toString()));
-                    } catch (NumberFormatException ignore) {
-                    }
+                    book.setDownloadCount(Long.parseLong(downloadCount.toString()));
                 }
 
                 books.add(book);
@@ -188,22 +179,18 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
         OffsetDateTime start = OffsetDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
         OffsetDateTime stop = OffsetDateTime.now();
 
-        try {
-            DeleteApi deleteApi = influxDBClient.getDeleteApi();
 
-            String idsCondition = ids.stream()
-                    .map(id -> "id=\"" + id + "\"")
-                    .collect(Collectors.joining(" OR "));
+        DeleteApi deleteApi = influxDBClient.getDeleteApi();
 
-            String predicate = String.format("_measurement=\"%s\" AND (%s)", MEASUREMENT, idsCondition);
+        String idsCondition = ids.stream()
+                .map(id -> "id=\"" + id + "\"")
+                .collect(Collectors.joining(" OR "));
 
-            deleteApi.delete(start, stop, predicate, bucket, org);
+        String predicate = String.format("_measurement=\"%s\" AND (%s)", MEASUREMENT, idsCondition);
 
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        deleteApi.delete(start, stop, predicate, bucket, org);
+
+        return true;
     }
 
     @Override

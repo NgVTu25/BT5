@@ -26,7 +26,6 @@ public class DatabasePerformanceTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // ================= MAIN LOGIC =================
     public void generateAndInsert(String dbType) {
         int totalRecords = 500_000;
         int batchSize = 2000;
@@ -113,20 +112,16 @@ public class DatabasePerformanceTest {
     private Object convertToCorrectType(Object bookBody, String dbType) {
         String type = dbType.toLowerCase();
 
-        try {
-            if (type.contains("mysql") || type.contains("sql")) {
-                return objectMapper.convertValue(bookBody, BookSQL.class);
-            } else if (type.contains("mongo")) {
-                return objectMapper.convertValue(bookBody, BookDocument.class);
-            } else if (type.contains("redis")) {
-                return objectMapper.convertValue(bookBody, BookCache.class);
-            } else if (type.contains("influx")) {
-                return objectMapper.convertValue(bookBody, BookMetric.class);
-            } else {
-                throw new IllegalArgumentException("Database type không được hỗ trợ: " + dbType);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi convert: " + e.getMessage());
+        if (type.contains("mysql") || type.contains("sql")) {
+            return objectMapper.convertValue(bookBody, BookSQL.class);
+        } else if (type.contains("mongo")) {
+            return objectMapper.convertValue(bookBody, BookDocument.class);
+        } else if (type.contains("redis")) {
+            return objectMapper.convertValue(bookBody, BookCache.class);
+        } else if (type.contains("influx")) {
+            return objectMapper.convertValue(bookBody, BookMetric.class);
+        } else {
+            throw new IllegalArgumentException("Database không hợp lệ: " + dbType);
         }
     }
 

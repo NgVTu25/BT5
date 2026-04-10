@@ -19,9 +19,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BookService {
-    private final Map<String, BookRepository> bookRepositories;
-    private final ObjectMapper objectMapper;
-
     private static final Map<String, Class<?>> MODEL_MAPPING = Map.of(
             "mysql", BookSQL.class,
             "sql", BookSQL.class,
@@ -31,6 +28,8 @@ public class BookService {
             "cache", BookCache.class,
             "influx", BookMetric.class
     );
+    private final Map<String, BookRepository> bookRepositories;
+    private final ObjectMapper objectMapper;
 
     private Class<?> getModelClass(String dbType) {
         return MODEL_MAPPING.entrySet().stream()
@@ -96,11 +95,8 @@ public class BookService {
 
         Class<?> targetClass = getModelClass(type);
 
-        try {
-            return objectMapper.convertValue(rawBook, targetClass);
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi convert sang " + targetClass.getSimpleName() + ": " + e.getMessage());
-        }
+        return objectMapper.convertValue(rawBook, targetClass);
+
     }
 
 }

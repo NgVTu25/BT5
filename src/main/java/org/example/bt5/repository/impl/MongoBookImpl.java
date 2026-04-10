@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -19,9 +18,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MongoBookImpl implements BookRepository<BookDocument, String> {
     private final MongoDBRepository mongoDBRepository;
-
-    private final MongoTemplate mongoTemplate;
-
 
     @Override
     public void saveBook(BookDocument book) {
