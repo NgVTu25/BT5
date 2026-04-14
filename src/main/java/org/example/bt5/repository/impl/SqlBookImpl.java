@@ -26,39 +26,6 @@ public class SqlBookImpl implements BookRepository<BookSQL, Long> {
         System.out.println(book.getId());
     }
 
-//    @Override
-//    public Page<BookSQL> searchBooks(String title, String author, String content, Pageable pageable) {
-//
-//        Specification<BookSQL> spec = (root, query, cb) -> cb.conjunction();
-//
-//        if (title != null && !title.isBlank()) {
-//            spec = spec.and((root, query, cb) ->
-//                    cb.like((root.get("title")), "%" + title.toLowerCase() + "%"));
-//        }
-//
-//        if (author != null && !author.isBlank()) {
-//            spec = spec.and((root, query, cb) ->
-//                    cb.like((root.get("author")), "%" + author.toLowerCase() + "%"));
-//        }
-//
-//        if (content != null && !content.isBlank()) {
-//            spec = spec.and((root, query, cb) ->
-//                    cb.like((root.get("content")), "%" + content.toLowerCase() + "%"));
-//        }
-//
-//        pageable = PageRequest.of(
-//                pageable == null ? 0 : pageable.getPageNumber(),
-//                pageable == null ? 10 : pageable.getPageSize(),
-//                Sort.by("author").ascending()
-//        );
-//
-//        return sqlRepository.findAll(spec, pageable);
-//    }
-
-//    private String normalize(String input) {
-//        return (input == null || input.isBlank()) ? null : input.trim();
-//    }
-
     @Override
     public Page<BookSQL> searchBooks(String title, String author, String content, Pageable pageable) {
 
@@ -94,14 +61,14 @@ public class SqlBookImpl implements BookRepository<BookSQL, Long> {
 
     @Override
     public Boolean updateBook(Long id, BookSQL book) {
-        BookSQL upBook = sqlRepository.findById(id).orElse(null);
+        BookSQL upBook = sqlRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy sách với ID: " + id));
 
         if (upBook != null) {
-            upBook.setTitle(book.getTitle());
-            upBook.setAuthor(book.getAuthor());
-            upBook.setContent(book.getContent());
-            upBook.setCategory(book.getCategory());
-            upBook.setViewCount(book.getViewCount());
+            upBook.setTitle(book.getTitle() != null ? book.getTitle() : upBook.getTitle());
+            upBook.setAuthor(book.getAuthor() != null ? book.getAuthor() : upBook.getAuthor());
+            upBook.setContent(book.getContent() != null ? book.getContent() : upBook.getContent());
+            upBook.setCategory(book.getCategory() != null ? book.getCategory() : upBook.getCategory());
+            upBook.setViewCount(book.getViewCount() != null ? book.getViewCount() : upBook.getViewCount());
 
             sqlRepository.save(upBook);
             return true;

@@ -3,6 +3,7 @@ package org.example.bt5.repository.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.bt5.model.BookCache;
 import org.example.bt5.repository.BookRepository;
+import org.jspecify.annotations.NonNull;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -93,7 +94,6 @@ public class RedisBookImpl implements BookRepository<BookCache, String> {
             // total
             stringRedisTemplate.opsForHash().increment(statsKey, "total", -1);
 
-            // ✅ NEW: category stats
             if (book.getCategory() != null && !book.getCategory().isBlank()) {
                 String categoryKey = "category:" + normalize(book.getCategory());
                 stringRedisTemplate.opsForHash().increment(statsKey, categoryKey, -1);
@@ -257,7 +257,7 @@ public class RedisBookImpl implements BookRepository<BookCache, String> {
 
         stringRedisTemplate.executePipelined(new SessionCallback<>() {
             @Override
-            public Object execute(RedisOperations operations) throws DataAccessException {
+            public Object execute(@NonNull RedisOperations operations) throws DataAccessException {
                 for (BookCache book : books) {
                     operations.opsForList().rightPush(BOOKS_ALL_KEY, book.getId());
                     addIndexes(operations, book);
