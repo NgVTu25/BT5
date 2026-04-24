@@ -110,13 +110,13 @@ public class RedisBookImpl implements BookRepository<BookCache, String> {
 
         String key = bookKey(book.getId());
         if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
-	        return null;
+            return null;
         }
 
         redisTemplate.opsForValue().set(key, book);
         stringRedisTemplate.opsForList().rightPush(BOOKS_ALL_KEY, book.getId());
         addIndexes(stringRedisTemplate, book);
-	    return book;
+        return book;
     }
 
     @Override
@@ -268,14 +268,14 @@ public class RedisBookImpl implements BookRepository<BookCache, String> {
 
     @Override
     public Object findById(String s) {
-	    String key = bookKey(s);
+        String key = bookKey(s);
 
-	    Object result = redisTemplate.opsForValue().get(key);
+        Object result = redisTemplate.opsForValue().get(key);
 
-	    System.out.println("Searching Redis with key: " + key);
-	    System.out.println("Result found: " + (result != null));
+        System.out.println("Searching Redis with key: " + key);
+        System.out.println("Result found: " + (result != null));
 
-	    return result;
+        return result;
     }
 
     private Page<BookCache> buildPageFromIds(List<String> ids, Pageable pageable, long total) {

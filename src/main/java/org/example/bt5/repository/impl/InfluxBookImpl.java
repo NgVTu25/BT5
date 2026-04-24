@@ -136,17 +136,22 @@ public class InfluxBookImpl implements BookRepository<BookMetric, String> {
     public Object findById(String s) {
         String flux = String.format(
                 "from(bucket: \"%s\") " +
-                        "|> range(start: 0) " +
+                        "|> range(start: -1y) " +
                         "|> filter(fn: (r) => r[\"_measurement\"] == \"book_metrics\") " +
-                        "|> filter(fn: (r) => r.id == \"%s\") " +
+                        "|> filter(fn: (r) => r[\"id\"] == \"%s\") " +
+                        "|> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\") " +
                         "|> last()",
                 bucket, s
         );
 
         QueryApi queryApi = influxDBClient.getQueryApi();
-        List<BookMetric> results = queryApi.query(flux, org, BookMetric.class);
-
-        return results.isEmpty() ? null : results.getFirst();
+        try {
+            List<BookMetric> results = queryApi.query(flux, org, BookMetric.class);
+            return results.isEmpty() ? null : results.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Point writeData(BookMetric book) {

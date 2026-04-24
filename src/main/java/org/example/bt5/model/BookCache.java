@@ -18,28 +18,21 @@ import java.time.Instant;
 @AllArgsConstructor
 @RedisHash("book")
 public class BookCache {
+    @Column
+    public Long viewCount;
+    @Column
+    public Long downloadCount;
     @Column(tag = true, name = "id")
     @Id
     private String id;
-
     @Column(tag = true)
     private String author;
-
     @Column(tag = true)
     private String category;
-
     @Column
     private String title;
-
     @Column
     private String content;
-
-    @Column
-    public Long viewCount;
-
-    @Column
-    public Long downloadCount;
-
     @jakarta.persistence.Column(name = "create_date")
     private Instant createDate = Instant.now();
 

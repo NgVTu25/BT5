@@ -13,28 +13,28 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory();
-    }
+	@Bean
+	public RedisConnectionFactory redisConnectionFactory() {
+		return new LettuceConnectionFactory();
+	}
 
-    @Bean
-    public RedisTemplate<String, BookCache> redisTemplate(
-            RedisConnectionFactory connectionFactory,
-            ObjectMapper objectMapper) {
+	@Bean
+	public RedisTemplate<String, BookCache> redisTemplate(
+			RedisConnectionFactory connectionFactory,
+			ObjectMapper objectMapper) {
 
-        RedisTemplate<String, BookCache> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
+		RedisTemplate<String, BookCache> template = new RedisTemplate<>();
+		template.setConnectionFactory(connectionFactory);
 
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setHashKeySerializer(new StringRedisSerializer());
+		template.setKeySerializer(new StringRedisSerializer());
+		template.setHashKeySerializer(new StringRedisSerializer());
 
-        Jackson2JsonRedisSerializer<BookCache> serializer =
-                new Jackson2JsonRedisSerializer<>(objectMapper, BookCache.class);
+		Jackson2JsonRedisSerializer<BookCache> serializer =
+				new Jackson2JsonRedisSerializer<>(objectMapper, BookCache.class);
 
-        template.setValueSerializer(serializer);
-        template.setHashValueSerializer(serializer);
+		template.setValueSerializer(serializer);
+		template.setHashValueSerializer(serializer);
 
-        return template;
-    }
+		return template;
+	}
 }
